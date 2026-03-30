@@ -36,7 +36,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 16px;
-    max-width: 560px;
+    max-width: 780px;
     width: 100%;
 }
 
@@ -49,19 +49,52 @@ header h1 {
     opacity: 0.7;
 }
 
-/* Status bar */
-#status-bar {
+/* Game area: board + side panels */
+#game-area {
     display: flex;
-    gap: 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+}
+
+/* Side panels */
+.side-panel {
+    width: 130px;
+    min-width: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#side-panel-black {
+    order: 1;
+}
+
+#board-container {
+    order: 2;
+}
+
+#side-panel-white {
+    order: 3;
+}
+
+.side-player {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .player-info {
-    padding: 6px 16px;
-    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
     opacity: 0.4;
     transition: opacity 0.3s, background 0.3s;
+    white-space: nowrap;
 }
 
 .player-info.active {
@@ -89,6 +122,7 @@ header h1 {
     border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
 }
 
 #board {
@@ -197,24 +231,15 @@ header h1 {
 .square.dark .coord-rank { color: var(--light-sq); }
 
 /* Captured pieces */
-#captured {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-height: 36px;
-    width: 100%;
-    max-width: 520px;
-}
-
 .captured-row {
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
-    min-height: 18px;
+    min-height: 20px;
 }
 
 .captured-piece {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     line-height: 1;
     opacity: 0.8;
 }
@@ -287,12 +312,38 @@ header h1 {
     filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
 }
 
-/* Responsive */
+/* Responsive — tablets and smaller: stack vertically */
+@media (max-width: 700px) {
+    #game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .side-panel {
+        width: 100%;
+        min-width: 0;
+        max-width: 520px;
+    }
+
+    #side-panel-black { order: 1; }
+    #board-container { order: 2; }
+    #side-panel-white { order: 3; }
+
+    .side-player {
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 12px;
+    }
+
+    .captured-row {
+        flex: 1;
+    }
+}
+
 @media (max-width: 480px) {
     #app { padding: 8px; gap: 8px; }
     header h1 { font-size: 1.1rem; }
-    #status-bar { font-size: 0.8rem; gap: 8px; }
-    .player-info { padding: 4px 12px; }
+    .player-info { padding: 4px 10px; font-size: 0.8rem; }
     .promotion-choice { width: 52px; height: 52px; }
     .promotion-choice svg { width: 40px; height: 40px; }
     .square .coord-file,
