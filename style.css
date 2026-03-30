@@ -1,0 +1,305 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --light-sq: #f0d9b5;
+    --dark-sq: #b58863;
+    --selected: rgba(255, 255, 80, 0.6);
+    --move-dot: rgba(0, 0, 0, 0.2);
+    --capture-ring: rgba(0, 0, 0, 0.2);
+    --last-move: rgba(155, 199, 0, 0.4);
+    --check: radial-gradient(ellipse at center, rgba(255,0,0,0.6) 0%, rgba(255,0,0,0) 70%);
+    --bg: #312e2b;
+    --text: #e0d6c2;
+    --accent: #7fa650;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    max-width: 560px;
+    width: 100%;
+}
+
+header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+/* Status bar */
+#status-bar {
+    display: flex;
+    gap: 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.player-info {
+    padding: 6px 16px;
+    border-radius: 20px;
+    opacity: 0.4;
+    transition: opacity 0.3s, background 0.3s;
+}
+
+.player-info.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.white-dot { background: #fff; border: 1px solid #999; }
+.black-dot { background: #333; border: 1px solid #555; }
+
+/* Board */
+#board-container {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.square {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: none;
+}
+
+.square.light { background: var(--light-sq); }
+.square.dark { background: var(--dark-sq); }
+
+.square.selected { background: var(--selected) !important; }
+
+.square.last-move::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--last-move);
+    pointer-events: none;
+}
+
+.square.in-check {
+    background: radial-gradient(ellipse at center, rgba(255,0,0,0.6) 0%, rgba(231,76,60,0.3) 50%, transparent 70%);
+}
+
+/* Move indicators */
+.square.can-move::before {
+    content: '';
+    position: absolute;
+    width: 28%;
+    height: 28%;
+    border-radius: 50%;
+    background: var(--move-dot);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.square.can-capture::before {
+    content: '';
+    position: absolute;
+    width: 85%;
+    height: 85%;
+    border-radius: 50%;
+    border: 5px solid var(--capture-ring);
+    background: transparent;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Pieces */
+.piece {
+    font-size: 0;
+    width: 85%;
+    height: 85%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+    transition: transform 0.1s;
+}
+
+.piece svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Coordinate labels */
+.square .coord-file,
+.square .coord-rank {
+    position: absolute;
+    font-size: 0.6rem;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.6;
+}
+
+.square .coord-rank {
+    top: 2px;
+    left: 4px;
+}
+
+.square .coord-file {
+    bottom: 2px;
+    right: 4px;
+}
+
+.square.light .coord-file,
+.square.light .coord-rank { color: var(--dark-sq); }
+.square.dark .coord-file,
+.square.dark .coord-rank { color: var(--light-sq); }
+
+/* Captured pieces */
+#captured {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 36px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.captured-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    min-height: 18px;
+}
+
+.captured-piece {
+    font-size: 1.1rem;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+/* Message */
+#message {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-height: 1.6em;
+    text-align: center;
+    color: var(--accent);
+}
+
+/* New game button */
+#new-game-btn {
+    padding: 10px 28px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.2s;
+}
+
+#new-game-btn:hover { background: #6b9140; }
+
+/* Promotion modal */
+#promotion-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.promotion-choices {
+    display: flex;
+    gap: 8px;
+    background: #3d3a37;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.promotion-choice {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.promotion-choice:hover {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.08);
+}
+
+.promotion-choice svg {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #app { padding: 8px; gap: 8px; }
+    header h1 { font-size: 1.1rem; }
+    #status-bar { font-size: 0.8rem; gap: 8px; }
+    .player-info { padding: 4px 12px; }
+    .promotion-choice { width: 52px; height: 52px; }
+    .promotion-choice svg { width: 40px; height: 40px; }
+    .square .coord-file,
+    .square .coord-rank { font-size: 0.45rem; }
+}
+
+@media (max-width: 360px) {
+    .square .coord-file,
+    .square .coord-rank { display: none; }
+}
